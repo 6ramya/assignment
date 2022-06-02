@@ -1,4 +1,6 @@
-class UserModel {
+import 'package:equatable/equatable.dart';
+
+class UserModel extends Equatable{
   String? login;
   int? id;
   String? nodeId;
@@ -81,4 +83,10 @@ class UserModel {
     data['site_admin'] = this.siteAdmin;
     return data;
   }
+
+  @override
+  // TODO: implement props
+  List<Object?> get props => [login,id,nodeId,avatarUrl,gravatarId
+  ,url,htmlUrl,followersUrl,followingUrl,gistsUrl,starredUrl,subscriptionsUrl,organizationsUrl,reposUrl,
+  eventsUrl,receivedEventsUrl,type,siteAdmin];
 }

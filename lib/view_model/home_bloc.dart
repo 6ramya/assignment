@@ -1,4 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:technical_assignment/model/mock_user_data.dart';
 import 'package:technical_assignment/view_model/home_state.dart';
 
 import '../model/user_model.dart';
@@ -6,16 +7,20 @@ import 'home_event.dart';
 import 'home_repository.dart';
 
 class HomeBloc extends Bloc<HomeEvent, HomeState> {
-  HomeRepository? homeRepository;
+  final HomeRepository homeRepository;
 
-  HomeBloc({this.homeRepository}) : super(UserListInitialState()) {
+  HomeBloc({required this.homeRepository}) : super(UserListInitialState()) {
     on<fetchUserDetails>((event, emit) async {
       emit(UserListLoadingState());
-      final response = await homeRepository!.fetchUsers();
-      var len = response!.length;
-      List<Map<int, bool>>? values =
-          List.generate(len, (index) => {response[index].id!: false});
-      emit(UserListLoadedState(response, values));
+      try {
+        List<UserModel>? response = await homeRepository.fetchUsers();
+        var len = response!.length;
+        List<Map<int, bool>>? values =
+            List.generate(len, (index) => {response[index].id!: false});
+        emit(UserListLoadedState(response, values));
+      } on Exception catch (e) {
+        emit(UserListFailureState(e.toString()));
+      }
     });
   }
 }

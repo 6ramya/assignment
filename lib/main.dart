@@ -10,21 +10,20 @@ void main() {
 
 class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return RepositoryProvider(
-      create: (context)=>HomeRepository(),
+        create: (context) => HomeRepository(),
         // child:BlocProvider(create: (_)=>HomeBloc(homeRepository: context.read<HomeRepository>()),
         child: MaterialApp(
-          title: 'Flutter Demo',
+          title: 'Assignment',
           debugShowCheckedModeBanner: false,
           theme: ThemeData(
             brightness: Brightness.light,
-            // primaryColor: Colors.white,
             primarySwatch: Colors.blue,
           ),
           home: const HomePage(),
         ));
-
   }
 }

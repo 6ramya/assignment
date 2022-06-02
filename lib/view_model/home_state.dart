@@ -11,7 +11,7 @@ class UserListInitialState extends HomeState {
 
   @override
   // TODO: implement props
-  List<Object?> get props => throw UnimplementedError();
+  List<Object?> get props => [];
 }
 
 class UserListLoadingState extends HomeState {
@@ -19,7 +19,7 @@ class UserListLoadingState extends HomeState {
 
   @override
   // TODO: implement props
-  List<Object?> get props => throw UnimplementedError();
+  List<Object?> get props => [];
 }
 
 class UserListLoadedState extends HomeState {
@@ -31,6 +31,16 @@ class UserListLoadedState extends HomeState {
   @override
   // TODO: implement props
   List<Object?> get props => [user];
+}
+
+class UserListFailureState extends HomeState {
+  final String errorMessage;
+
+  const UserListFailureState(this.errorMessage);
+
+  @override
+  // TODO: implement props
+  List<Object?> get props => [];
 }
 
 abstract class HomeState1 extends Equatable {
@@ -58,5 +68,5 @@ class selectedUsersLoadedState extends HomeState1 {
 
   @override
   // TODO: implement props
-  List<Object?> get props => throw UnimplementedError();
+  List<Object?> get props => [user];
 }
