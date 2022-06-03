@@ -15,15 +15,21 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return RepositoryProvider(
         create: (context) => HomeRepository(),
-        // child:BlocProvider(create: (_)=>HomeBloc(homeRepository: context.read<HomeRepository>()),
-        child: MaterialApp(
-          title: 'Assignment',
-          debugShowCheckedModeBanner: false,
-          theme: ThemeData(
-            brightness: Brightness.light,
-            primarySwatch: Colors.blue,
-          ),
-          home: const HomePage(),
-        ));
+        child: MultiBlocProvider(
+            providers: [
+              BlocProvider(
+                  create: (context) =>
+                      HomeBloc(homeRepository: HomeRepository())),
+              BlocProvider(create: (context) => HomeBloc1())
+            ],
+            child: MaterialApp(
+              title: 'Assignment',
+              debugShowCheckedModeBanner: false,
+              theme: ThemeData(
+                brightness: Brightness.light,
+                primarySwatch: Colors.blue,
+              ),
+              home: const HomePage(),
+            )));
   }
 }
