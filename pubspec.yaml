@@ -32,6 +32,7 @@ dependencies:
 
   flutter_bloc: ^8.0.1
   bloc: ^8.0.3
+  network_image_mock: ^2.1.0
 
   dio: ^4.0.6
 
