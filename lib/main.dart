@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:path/path.dart';
+import 'package:sqflite/sqflite.dart';
 import 'package:technical_assignment/view_model/home_bloc.dart';
 import 'package:technical_assignment/view_model/home_repository.dart';
 import 'package:technical_assignment/views/home_page.dart';
 
-void main() {
+void main(){
   runApp(const MyApp());
 }
 

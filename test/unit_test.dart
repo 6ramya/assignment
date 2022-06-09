@@ -7,6 +7,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
+import 'package:sqflite/sqflite.dart';
+import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:technical_assignment/model/mock_user_data.dart';
 import 'package:technical_assignment/model/user_model.dart';
 import 'package:technical_assignment/view_model/home_bloc.dart';
@@ -25,6 +27,8 @@ void main() {
   group('HomeBloc test', () {
     MockHomeRepository mockHomeRepository;
     mockHomeRepository = MockHomeRepository();
+    sqfliteFfiInit();
+    databaseFactory = databaseFactoryFfi;
 
     blocTest<HomeBloc, HomeState>(
         'emits [UserListLoadingState,UserListLoadedState] states for successful task loads',
@@ -34,7 +38,6 @@ void main() {
           return HomeBloc(homeRepository: mockHomeRepository);
         },
         act: (bloc) => bloc.add(fetchUserDetails()),
-
         expect: () => [
               UserListLoadingState(),
               UserListLoadedState(mockUsers, mockValues),
@@ -51,8 +54,6 @@ void main() {
         expect: () => [
               UserListLoadingState(),
               UserListFailureState('error occured'),
-            ]
-    );
-
+            ]);
   });
 }

@@ -1,6 +1,8 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:technical_assignment/database.dart';
 import 'package:technical_assignment/view_model/home_bloc.dart';
 import 'package:technical_assignment/view_model/home_event.dart';
 import 'package:technical_assignment/view_model/home_repository.dart';
@@ -18,13 +20,18 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   late HomeBloc homeBloc;
   late HomeBloc1 homeBloc1;
-  List<UserModel> users = [];
+
+  late Future<List<UserModel>> users;
+
+  late Future<List<Map<String, dynamic>>> values;
 
   @override
   void initState() {
     homeBloc = BlocProvider.of<HomeBloc>(context);
     homeBloc1 = BlocProvider.of<HomeBloc1>(context);
     homeBloc.add(fetchUserDetails());
+    users = DatabaseHelper.instance.users();
+    values = DatabaseHelper.instance.values();
     super.initState();
   }
 
@@ -62,17 +69,35 @@ class _HomePageState extends State<HomePage> {
                     return buildListTile(
                       user: state.user,
                       values: state.values,
-                      users: users,
                       homeBloc1: BlocProvider.of<HomeBloc1>(context),
                     );
                   }
 
                   if (state is UserListFailureState) {
-                    WidgetsBinding.instance.addPostFrameCallback((_) {
-                      Scaffold.of(context).showSnackBar(
-                          SnackBar(content: Text('${state.errorMessage}')));
-                    });
+                    return FutureBuilder(
+                      future: Future.wait([users, values]),
+                      builder:
+                          (context, AsyncSnapshot<List<dynamic>> snapshot) {
+                        if (snapshot.connectionState == ConnectionState.done) {
+                          List<UserModel>? user = snapshot.data?[0];
+                          List<Map<String, dynamic>> values = snapshot.data?[1];
+                          return buildListTile(
+                            user: user,
+                            values: values,
+                            homeBloc1: BlocProvider.of<HomeBloc1>(context),
+                          );
+                        } else {
+                          return Center(child: CircularProgressIndicator());
+                        }
+                      },
+                    );
+
+                    //   WidgetsBinding.instance.addPostFrameCallback((_) {
+                    //     Scaffold.of(context).showSnackBar(
+                    //         SnackBar(content: Text('Something went wrong!!')));
+                    //   });
                   }
+
                   return Center(child: CircularProgressIndicator());
                 }),
                 BlocBuilder<HomeBloc1, HomeState1>(builder: (context, state) {
@@ -81,15 +106,32 @@ class _HomePageState extends State<HomePage> {
                         children: List.generate(
                       state.user!.length,
                       (index) {
-                        return CheckboxListTile(
-                          title: Text('${state.user![index].login}'),
-                          value: true,
-                          onChanged: (bool? value) {
-                            setState(() {});
-                          },
-                          secondary:
-                              Image.network('${state.user![index].avatarUrl}'),
-                        );
+                        return Visibility(
+                            visible: state.values![index]
+                                [state.user![index].id.toString()],
+                            child: Column(
+                              children: [
+                                CheckboxListTile(
+                                    title: Text('${state.user![index].login}'),
+                                    value: state.values![index]
+                                        [state.user![index].id!.toString()],
+                                    onChanged: (bool? value) {
+                                      setState(() {
+                                        state.values![index][state.user![index].id!
+                                            .toString()] = value!;
+                                      });
+                                    },
+                                    secondary: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        CachedNetworkImage(
+                                            imageUrl:
+                                                '${state.user![index].avatarUrl}'),
+                                      ],
+                                    )),
+                                SizedBox(height: 15)    
+                              ],
+                            ));
                       },
                     ));
                   }
@@ -102,16 +144,10 @@ class _HomePageState extends State<HomePage> {
 
 class buildListTile extends StatefulWidget {
   List<UserModel>? user;
-  List<Map<int, bool>>? values;
-  List<UserModel> users;
+  List<Map<String, dynamic>>? values;
   HomeBloc1 homeBloc1;
 
-  buildListTile(
-      {Key? key,
-      this.user,
-      this.values,
-      required this.users,
-      required this.homeBloc1})
+  buildListTile({Key? key, this.user, this.values, required this.homeBloc1})
       : super(key: key);
 
   @override
@@ -128,22 +164,24 @@ class _buildListTileState extends State<buildListTile> {
         return Column(
           children: [
             CheckboxListTile(
-              title: Text('${widget.user![index].login}'),
-              value: widget.values![index][widget.user![index].id],
-              onChanged: (bool? value) {
-                setState(() {
-                  widget.values![index][widget.user![index].id!] = value!;
-                  if (value) {
-                    widget.users.add(widget.user![index]);
-                  }
-                  if (value == false) {
-                    widget.users.remove(widget.user![index]);
-                  }
-                  widget.homeBloc1.add(setSelectedUser(user: widget.users));
-                });
-              },
-              secondary: Image.network('${widget.user![index].avatarUrl}'),
-            ),
+                title: Text('${widget.user![index].login}'),
+                value: widget.values![index][widget.user![index].id.toString()],
+                onChanged: (bool? value) {
+                  setState(() {
+                    widget.values![index][widget.user![index].id!.toString()] =
+                        value!;
+
+                    widget.homeBloc1.add(setSelectedUser(
+                        user: widget.user, values: widget.values));
+                  });
+                },
+                secondary: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    CachedNetworkImage(
+                        imageUrl: '${widget.user![index].avatarUrl}'),
+                  ],
+                )),
             SizedBox(height: 15)
           ],
         );

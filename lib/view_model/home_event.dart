@@ -14,8 +14,9 @@ abstract class HomeEvent1 extends Equatable {}
 
 class setSelectedUser extends HomeEvent1 {
   List<UserModel>? user;
+  List<Map<String,dynamic>>? values;
 
-  setSelectedUser({this.user});
+  setSelectedUser({this.user,this.values});
 
   @override
   // TODO: implement props
@@ -23,7 +24,11 @@ class setSelectedUser extends HomeEvent1 {
 }
 
 class fetchSelectedUser extends HomeEvent1 {
+  List<UserModel>? user;
+  List<Map<int,bool>>? values;
+
+  fetchSelectedUser({this.values, this.user});
   @override
   // TODO: implement props
-  List<Object?> get props => throw UnimplementedError();
+  List<Object?> get props => [user];
 }

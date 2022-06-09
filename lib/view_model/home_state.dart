@@ -24,7 +24,7 @@ class UserListLoadingState extends HomeState {
 
 class UserListLoadedState extends HomeState {
   List<UserModel>? user;
-  List<Map<int, bool>>? values;
+  List<Map<String,dynamic>>? values;
 
   UserListLoadedState(this.user, this.values);
 
@@ -63,8 +63,9 @@ class selectedUsersLoadingState extends HomeState1 {
 
 class selectedUsersLoadedState extends HomeState1 {
   List<UserModel>? user = [];
+  List<Map<String,dynamic>>? values;
 
-  selectedUsersLoadedState({this.user});
+  selectedUsersLoadedState({this.user,this.values});
 
   @override
   // TODO: implement props
